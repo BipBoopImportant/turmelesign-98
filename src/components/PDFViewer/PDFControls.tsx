@@ -33,7 +33,7 @@ export const PDFControls: React.FC<PDFControlsProps> = ({
   onPageInputChange,
   onPageInputKeyDown
 }) => {
-  return <div className="flex items-center justify-between p-4 border-b shadow-sm bg-black">
+  return <div className="flex items-center justify-between p-4 border-b shadow-sm bg-card">
       <div className="flex items-center gap-2">
         <Button variant="outline" size="sm" onClick={onZoomOut} disabled={scale <= 0.5}>
           <ZoomOut className="h-4 w-4" />

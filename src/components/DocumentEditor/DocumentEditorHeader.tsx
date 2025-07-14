@@ -39,7 +39,7 @@ export const DocumentEditorHeader: React.FC<DocumentEditorHeaderProps> = ({
   const {
     t
   } = useLanguage();
-  return <div className="border-b p-4 bg-stone-950">
+  return <div className="border-b p-4 bg-card">
       <div className="flex items-center justify-between max-w-7xl mx-auto">
         <div className="flex items-center gap-4">
           <Button variant="ghost" onClick={onClose}>
