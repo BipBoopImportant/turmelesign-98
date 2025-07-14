@@ -2,17 +2,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import {
-  ZoomIn,
-  ZoomOut,
-  RotateCcw,
-  RotateCw,
-  Maximize,
-  Minimize,
-  ChevronLeft,
-  ChevronRight
-} from 'lucide-react';
-
+import { ZoomIn, ZoomOut, RotateCcw, RotateCw, Maximize, Minimize, ChevronLeft, ChevronRight } from 'lucide-react';
 interface PDFControlsProps {
   scale: number;
   currentPage: number;
@@ -28,7 +18,6 @@ interface PDFControlsProps {
   onPageInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onPageInputKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
 }
-
 export const PDFControls: React.FC<PDFControlsProps> = ({
   scale,
   currentPage,
@@ -44,8 +33,7 @@ export const PDFControls: React.FC<PDFControlsProps> = ({
   onPageInputChange,
   onPageInputKeyDown
 }) => {
-  return (
-    <div className="flex items-center justify-between p-4 bg-white border-b shadow-sm">
+  return <div className="flex items-center justify-between p-4 border-b shadow-sm bg-black">
       <div className="flex items-center gap-2">
         <Button variant="outline" size="sm" onClick={onZoomOut} disabled={scale <= 0.5}>
           <ZoomOut className="h-4 w-4" />
@@ -68,34 +56,16 @@ export const PDFControls: React.FC<PDFControlsProps> = ({
       </div>
 
       <div className="flex items-center gap-2">
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={() => onPageChange(currentPage - 1)}
-          disabled={currentPage <= 1}
-        >
+        <Button variant="outline" size="sm" onClick={() => onPageChange(currentPage - 1)} disabled={currentPage <= 1}>
           <ChevronLeft className="h-4 w-4" />
         </Button>
         
         <div className="flex items-center gap-1">
-          <Input
-            value={pageInput}
-            onChange={onPageInputChange}
-            onKeyDown={onPageInputKeyDown}
-            className="w-12 h-8 text-center text-sm"
-            type="number"
-            min="1"
-            max={numPages}
-          />
+          <Input value={pageInput} onChange={onPageInputChange} onKeyDown={onPageInputKeyDown} className="w-12 h-8 text-center text-sm" type="number" min="1" max={numPages} />
           <span className="text-sm text-gray-600">of {numPages}</span>
         </div>
 
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={() => onPageChange(currentPage + 1)}
-          disabled={currentPage >= numPages}
-        >
+        <Button variant="outline" size="sm" onClick={() => onPageChange(currentPage + 1)} disabled={currentPage >= numPages}>
           <ChevronRight className="h-4 w-4" />
         </Button>
 
@@ -103,6 +73,5 @@ export const PDFControls: React.FC<PDFControlsProps> = ({
           {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
         </Button>
       </div>
-    </div>
-  );
+    </div>;
 };
