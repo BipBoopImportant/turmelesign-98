@@ -7,6 +7,7 @@ import { Auth } from '@/components/Auth';
 import { Navigation } from '@/components/Navigation';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { LanguageProvider } from '@/contexts/LanguageContext';
+import { ThemeProvider } from '@/providers/ThemeProvider';
 import type { User } from '@supabase/supabase-js';
 
 // Lazy load components for better performance
@@ -141,30 +142,37 @@ function App() {
 
   return (
     <ErrorBoundary>
-      <LanguageProvider>
-        <QueryClientProvider client={queryClient}>
-          <Router>
-            <Routes>
-              {/* Public signing route - no authentication required */}
-              <Route path="/sign/:documentId/:signerEmail" element={
-                <Suspense fallback={<LoadingFallback />}>
-                  <SigningInterfaceWrapper />
-                </Suspense>
-              } />
-              
-              {/* Protected routes */}
-              <Route path="/*" element={
-                user ? (
-                  <ProtectedRoutes user={user} onSignOut={handleSignOut} />
-                ) : (
-                  <Auth onAuthSuccess={handleAuthSuccess} />
-                )
-              } />
-            </Routes>
-            <Toaster />
-          </Router>
-        </QueryClientProvider>
-      </LanguageProvider>
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="light"
+        enableSystem={false}
+        disableTransitionOnChange={false}
+      >
+        <LanguageProvider>
+          <QueryClientProvider client={queryClient}>
+            <Router>
+              <Routes>
+                {/* Public signing route - no authentication required */}
+                <Route path="/sign/:documentId/:signerEmail" element={
+                  <Suspense fallback={<LoadingFallback />}>
+                    <SigningInterfaceWrapper />
+                  </Suspense>
+                } />
+                
+                {/* Protected routes */}
+                <Route path="/*" element={
+                  user ? (
+                    <ProtectedRoutes user={user} onSignOut={handleSignOut} />
+                  ) : (
+                    <Auth onAuthSuccess={handleAuthSuccess} />
+                  )
+                } />
+              </Routes>
+              <Toaster />
+            </Router>
+          </QueryClientProvider>
+        </LanguageProvider>
+      </ThemeProvider>
     </ErrorBoundary>
   );
 }

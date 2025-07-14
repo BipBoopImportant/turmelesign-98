@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LanguageToggle } from '@/components/LanguageToggle';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { EmailConfigurationDialog } from '@/components/EmailConfigurationDialog';
 import { LogOut, FileText, User } from 'lucide-react';
 
@@ -55,6 +56,7 @@ export const Navigation: React.FC<NavigationProps> = ({ userEmail, onSignOut }) 
             )}
             <EmailConfigurationDialog />
             <LanguageToggle />
+            <ThemeToggle />
             <Button variant="outline" onClick={handleSignOut}>
               <LogOut className="h-4 w-4 mr-2" />
               {t('nav.signOut')}
