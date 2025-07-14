@@ -62,7 +62,7 @@ export const PDFControls: React.FC<PDFControlsProps> = ({
         
         <div className="flex items-center gap-1">
           <Input value={pageInput} onChange={onPageInputChange} onKeyDown={onPageInputKeyDown} className="w-12 h-8 text-center text-sm" type="number" min="1" max={numPages} />
-          <span className="text-sm text-gray-600">of {numPages}</span>
+          <span className="text-sm text-muted-foreground">of {numPages}</span>
         </div>
 
         <Button variant="outline" size="sm" onClick={() => onPageChange(currentPage + 1)} disabled={currentPage >= numPages}>
