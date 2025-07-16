@@ -247,12 +247,20 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      document_has_pending_signers: {
+        Args: { doc_id: string }
+        Returns: boolean
+      }
       has_pending_signer: {
         Args: { document_id: string }
         Returns: boolean
       }
       is_document_owner: {
         Args: { document_id: string }
+        Returns: boolean
+      }
+      is_pending_signer_for_document: {
+        Args: { doc_id: string; signer_email: string }
         Returns: boolean
       }
       is_pending_signer_for_field: {
