@@ -1,1 +1,4 @@
 project_id = "rqbypmoxcvtiljwctwlq"
+
+[functions.send-signing-email]
+verify_jwt = true

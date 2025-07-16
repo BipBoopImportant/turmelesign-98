@@ -18,20 +18,33 @@ interface EmailRequest {
 
 // Domain resolution utility
 class DomainResolver {
-  private static readonly FALLBACK_DOMAIN = 'https://preview--turmelesign-19.lovable.app';
+  private static getProductionDomain(): string {
+    // Get the production domain from environment variable or detect from Supabase project
+    const customDomain = Deno.env.get('PRODUCTION_DOMAIN');
+    if (customDomain) {
+      return customDomain;
+    }
+    
+    // Default production domain pattern for Lovable apps
+    return 'https://e451decf-73f9-45fd-aec6-089a06ec125a.lovableproject.com';
+  }
   
   static resolveAppDomain(request: Request): string {
     try {
+      // Check if we're in a production environment (not localhost or preview)
+      const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
+      const isProduction = supabaseUrl.includes('supabase.co');
+      
       // Try to get domain from request headers (most reliable)
       const origin = request.headers.get('origin');
       const referer = request.headers.get('referer');
       
-      if (origin) {
+      if (origin && !origin.includes('localhost') && !origin.includes('preview--')) {
         console.log('Domain resolved from origin header:', origin);
         return origin;
       }
       
-      if (referer) {
+      if (referer && !referer.includes('localhost') && !referer.includes('preview--')) {
         const url = new URL(referer);
         const domain = `${url.protocol}//${url.host}`;
         console.log('Domain resolved from referer header:', domain);
@@ -42,27 +55,37 @@ class DomainResolver {
       const forwardedHost = request.headers.get('x-forwarded-host');
       const host = request.headers.get('host');
       
-      if (forwardedHost) {
+      if (forwardedHost && !forwardedHost.includes('localhost') && !forwardedHost.includes('preview--')) {
         const domain = `https://${forwardedHost}`;
         console.log('Domain resolved from x-forwarded-host:', domain);
         return domain;
       }
       
-      if (host) {
-        // Determine protocol based on host pattern
-        const protocol = host.includes('localhost') || host.includes('127.0.0.1') ? 'http' : 'https';
-        const domain = `${protocol}://${host}`;
+      if (host && !host.includes('localhost') && !host.includes('preview--')) {
+        // Always use HTTPS for production
+        const domain = `https://${host}`;
         console.log('Domain resolved from host header:', domain);
         return domain;
       }
       
-      console.log('Using fallback domain:', this.FALLBACK_DOMAIN);
-      return this.FALLBACK_DOMAIN;
+      // If we're in production and can't resolve from headers, use production domain
+      if (isProduction) {
+        const productionDomain = this.getProductionDomain();
+        console.log('Using production domain:', productionDomain);
+        return productionDomain;
+      }
+      
+      // Fallback for development
+      const fallbackDomain = 'https://preview--turmelesign-19.lovable.app';
+      console.log('Using development fallback domain:', fallbackDomain);
+      return fallbackDomain;
       
     } catch (error) {
       console.error('Error resolving domain:', error);
-      console.log('Using fallback domain due to error:', this.FALLBACK_DOMAIN);
-      return this.FALLBACK_DOMAIN;
+      const isProduction = Deno.env.get('SUPABASE_URL')?.includes('supabase.co');
+      const fallbackDomain = isProduction ? this.getProductionDomain() : 'https://preview--turmelesign-19.lovable.app';
+      console.log('Using fallback domain due to error:', fallbackDomain);
+      return fallbackDomain;
     }
   }
   
@@ -506,23 +529,37 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
-    );
+    console.log("Send-signing-email function started");
+    console.log("Environment check - SUPABASE_URL exists:", !!Deno.env.get("SUPABASE_URL"));
+    console.log("Environment check - SERVICE_KEY exists:", !!Deno.env.get("SUPABASE_SERVICE_ROLE_KEY"));
+    
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    
+    if (!supabaseUrl || !serviceKey) {
+      console.error("Missing required environment variables");
+      throw new Error("Server configuration error - missing environment variables");
+    }
+
+    const supabase = createClient(supabaseUrl, serviceKey);
 
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
+      console.error("No authorization header provided");
       throw new Error("No authorization header");
     }
 
+    console.log("Attempting user authentication...");
     const { data: { user }, error: authError } = await supabase.auth.getUser(
       authHeader.replace("Bearer ", "")
     );
 
     if (authError || !user) {
+      console.error("Authentication failed:", authError?.message);
       throw new Error("Authentication failed");
     }
+
+    console.log("User authenticated successfully:", user.id);
 
     const { documentId, signerEmail, signerName, documentName, message, language = 'en' }: EmailRequest = await req.json();
 
