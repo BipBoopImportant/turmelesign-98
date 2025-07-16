@@ -25,8 +25,8 @@ class DomainResolver {
       return customDomain;
     }
     
-    // Default production domain pattern for Lovable apps
-    return 'https://e451decf-73f9-45fd-aec6-089a06ec125a.lovableproject.com';
+    // Default production domain for this app
+    return 'https://turmelesigns.lovable.app';
   }
   
   static resolveAppDomain(request: Request): string {
