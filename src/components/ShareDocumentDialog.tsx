@@ -219,15 +219,10 @@ export const ShareDocumentDialog: React.FC<ShareDocumentDialogProps> = ({
     setSendingEmails(prev => new Set(prev).add(signer.email));
     
     try {
-      console.log('Starting email send process for:', signer.email);
-      
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         throw new Error('Not authenticated');
       }
-
-      console.log('Session obtained, calling edge function...');
-      console.log('Function URL will be:', `https://rqbypmoxcvtiljwctwlq.supabase.co/functions/v1/send-signing-email`);
 
       const response = await supabase.functions.invoke('send-signing-email', {
         body: {
@@ -239,24 +234,14 @@ export const ShareDocumentDialog: React.FC<ShareDocumentDialogProps> = ({
           language
         },
         headers: {
-          Authorization: `Bearer ${session.access_token}`,
-          'Content-Type': 'application/json'
+          Authorization: `Bearer ${session.access_token}`
         }
       });
 
-      console.log('Edge function response:', response);
-
       if (response.error) {
-        console.error('Edge function error:', response.error);
         throw new Error(response.error.message || 'Failed to send email');
       }
 
-      if (response.data?.error) {
-        console.error('Email sending error:', response.data.error);
-        throw new Error(response.data.error || 'Failed to send email');
-      }
-
-      console.log('Email sent successfully');
       toast({
         title: t('share.emailSent'),
         description: `${t('share.emailSentDescription').replace('{name}', signer.name)}`,
@@ -264,12 +249,6 @@ export const ShareDocumentDialog: React.FC<ShareDocumentDialogProps> = ({
 
     } catch (error: any) {
       console.error('Error sending email:', error);
-      console.error('Error details:', {
-        message: error.message,
-        stack: error.stack,
-        cause: error.cause
-      });
-      
       toast({
         title: "Email Failed",
         description: error.message || "Failed to send signing invitation",
