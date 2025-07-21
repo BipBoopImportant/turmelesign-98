@@ -19,13 +19,7 @@ interface EmailRequest {
 // Domain resolution utility
 class DomainResolver {
   private static getProductionDomain(): string {
-    // Get the production domain from environment variable or detect from Supabase project
-    const customDomain = Deno.env.get('PRODUCTION_DOMAIN');
-    if (customDomain) {
-      return customDomain;
-    }
-    
-    // Default production domain for this app
+    // Always use the correct production domain
     return 'https://turmelesigns.lovable.app';
   }
   
